@@ -57,6 +57,7 @@ function ModelA() {
   const delayTimeoutRef = useRef(null);
 
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   const [page, setPage] = useState(1);
   const [lists, setLists] = useState([]);
@@ -68,22 +69,6 @@ function ModelA() {
   // console.log(lists);
 
   useEffect(() => {
-    const fetchList = async () => {
-      setLoading(true);
-
-      try {
-        const data = await axios.get(
-          `https://contact.mediusware.com/api/contacts/?search=0&page=${page}&page_size=2`
-        );
-
-        setLists(data.data.results);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchList();
   }, []);
 
@@ -92,6 +77,26 @@ function ModelA() {
   };
 
   // console.log(filteredList());
+
+  const fetchList = async () => {
+    if (page > 1) {
+      setLoadingMore(true);
+    }
+
+    try {
+      const data = await axios.get(
+        `https://contact.mediusware.com/api/contacts/?&page=${page}&page_size=10`
+      );
+
+      setLists((prev) => [...prev, ...data.data.results]);
+      setPage((prev) => prev + 1);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoadingMore(false);
+      setLoading(false);
+    }
+  };
 
   const submitSearch = (e) => {
     e.preventDefault();
@@ -118,13 +123,17 @@ function ModelA() {
     clearTimeout(delayTimeoutRef.current);
 
     if (search.length) {
-      delayTimeoutRef.current = setTimeout(() => {
+      delayTimeoutRef.current = setTimeout(async () => {
         setLoading(true);
-        console.log("handleInputChange");
 
         // Perform the search logic here
         // For example, you can make an API call to fetch filtered contacts
         // and update the filteredContacts state
+        const newData = await axios.get(
+          `https://contact.mediusware.com/api/contacts/?search=${search}&page=1&page_size=2`
+        );
+
+        console.log(newData.data.results);
 
         setLoading(false);
       }, 500);
@@ -147,7 +156,8 @@ function ModelA() {
 
     if (isBottom) {
       console.log("Reached the bottom of the scrollable div");
-      // fetchList();
+
+      fetchList();
     }
   };
 
@@ -162,7 +172,7 @@ function ModelA() {
           type="text"
           name="search"
           className="form-control"
-          placeholder="Search Countries"
+          placeholder="Search"
           ref={formSearchRef}
           onChange={handleInputChange}
         />
@@ -178,7 +188,7 @@ function ModelA() {
 
         {!loading && (
           <ul>
-            {lists.map((list) => {
+            {lists.map((list, index) => {
               return (
                 <li
                   onClick={() =>
@@ -186,12 +196,14 @@ function ModelA() {
                       state: { backgroundLocation: true },
                     })
                   }
-                  key={list.id}
+                  key={index}
                 >
                   Phone: {list.phone}, Country: {list.country?.name}
                 </li>
               );
             })}
+
+            {loadingMore && "Loading more....."}
           </ul>
         )}
       </div>
