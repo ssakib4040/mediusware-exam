@@ -61,6 +61,7 @@ function ModelA() {
 
   const [page, setPage] = useState(1);
   const [lists, setLists] = useState([]);
+  const [isEven, setIsEven] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [loadingMoreLists, setLoadingMoreLists] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -73,7 +74,10 @@ function ModelA() {
   }, []);
 
   const filteredList = () => {
-    return lists.filter((list) => list.country === "US");
+    // return lists.filter((list) => list.country === "US");
+    // Checkbox A - labeled ‘Only even’, when checked, only contacts with even ID (ex. 2, 4, 6...) should be displayed.
+
+    return isEven ? lists.filter((list) => list.id % 2 === 0) : lists;
   };
 
   // console.log(filteredList());
@@ -188,7 +192,7 @@ function ModelA() {
 
         {!loading && (
           <ul>
-            {lists.map((list, index) => {
+            {filteredList().map((list, index) => {
               return (
                 <li
                   onClick={() =>
@@ -198,7 +202,8 @@ function ModelA() {
                   }
                   key={index}
                 >
-                  Phone: {list.phone}, Country: {list.country?.name}
+                  Id: {list.id}, Phone: {list.phone}, Country:{" "}
+                  {list.country?.name}
                 </li>
               );
             })}
@@ -212,7 +217,13 @@ function ModelA() {
 
       <div style={{ display: "flex" }}>
         <div className="flex-fill d-flex align-items-center">
-          <input type="checkbox" id="vehicle1" name="vehicle1" value="Bike" />
+          <input
+            type="checkbox"
+            id="vehicle1"
+            name="vehicle1"
+            value={isEven}
+            onChange={(e) => setIsEven(e.target.checked)}
+          />
           <label htmlFor="vehicle1" className="ms-1">
             Only even
           </label>
