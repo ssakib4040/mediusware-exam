@@ -150,8 +150,6 @@ function ModelA() {
       ) <= 1;
 
     if (isBottom) {
-      console.log("Reached the bottom of the scrollable div");
-
       fetchList();
     }
   };
@@ -357,8 +355,6 @@ function ModelB() {
       ) <= 1;
 
     if (isBottom) {
-      console.log("Reached the bottom of the scrollable div");
-
       fetchList();
     }
   };
