@@ -10,10 +10,6 @@ const Problem2 = () => {
   const location = useLocation();
   const state = location.state;
 
-  console.log(location);
-
-  const [showModelC, setShowModelC] = useState(false);
-
   return (
     <div className="container">
       <div className="row justify-content-center mt-5">
@@ -67,20 +63,13 @@ function ModelA() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredContacts, setFilteredContacts] = useState([]);
 
-  // console.log(lists);
-
   useEffect(() => {
     fetchList();
   }, []);
 
   const filteredList = () => {
-    // return lists.filter((list) => list.country === "US");
-    // Checkbox A - labeled ‘Only even’, when checked, only contacts with even ID (ex. 2, 4, 6...) should be displayed.
-
     return isEven ? lists.filter((list) => list.id % 2 === 0) : lists;
   };
-
-  // console.log(filteredList());
 
   const fetchList = async () => {
     if (page > 1) {
@@ -102,7 +91,7 @@ function ModelA() {
     }
   };
 
-  const submitSearch = (e) => {
+  const submitSearch = async (e) => {
     e.preventDefault();
 
     clearTimeout(delayTimeoutRef.current);
@@ -113,10 +102,14 @@ function ModelA() {
     if (search.length) {
       setLoading(true);
 
-      setTimeout(() => {
-        setLoading(false);
-        console.log(search);
-      }, 400);
+      setPage(1);
+      const newData = await axios.get(
+        `https://contact.mediusware.com/api/contacts/?search=${search}&page=1&page_size=10`
+      );
+
+      setLists(newData.data?.results);
+
+      setLoading(false);
     }
   };
 
@@ -128,17 +121,17 @@ function ModelA() {
 
     if (search.length) {
       delayTimeoutRef.current = setTimeout(async () => {
-        setLoading(true);
-
         // Perform the search logic here
         // For example, you can make an API call to fetch filtered contacts
         // and update the filteredContacts state
+        setPage(1);
+
+        setLoading(true);
         const newData = await axios.get(
-          `https://contact.mediusware.com/api/contacts/?search=${search}&page=1&page_size=2`
+          `https://contact.mediusware.com/api/contacts/?search=${search}&page=1&page_size=10`
         );
 
-        console.log(newData.data.results);
-
+        setLists(newData.data?.results);
         setLoading(false);
       }, 500);
     } else {
@@ -207,6 +200,8 @@ function ModelA() {
                 </li>
               );
             })}
+
+            {filteredList().length === 0 && <li>No data found</li>}
 
             {loadingMore && "Loading more....."}
           </ul>
