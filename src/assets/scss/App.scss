@@ -1,3 +1,7 @@
 @import "abstract/variables";
-@import 'bootstrap/scss/bootstrap.scss';
+@import "bootstrap/scss/bootstrap.scss";
 @import "abstract/base";
+
+.btn {
+  border: none !important;
+}
