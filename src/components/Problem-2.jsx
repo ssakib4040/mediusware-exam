@@ -149,8 +149,6 @@ function ModelA() {
           scrollableDiv.clientHeight
       ) <= 1;
 
-    console.log("isBottom:", isBottom);
-
     if (isBottom) {
       console.log("Reached the bottom of the scrollable div");
 
@@ -357,8 +355,6 @@ function ModelB() {
           scrollableDiv.scrollTop -
           scrollableDiv.clientHeight
       ) <= 1;
-
-    console.log("isBottom:", isBottom);
 
     if (isBottom) {
       console.log("Reached the bottom of the scrollable div");
