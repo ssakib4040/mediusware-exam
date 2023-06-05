@@ -1,12 +1,16 @@
 import axios from "axios";
 import React, { useEffect, useState, useRef } from "react";
-import { Route, Routes, useNavigate } from "react-router-dom";
+import { Route, Routes, useNavigate, useLocation } from "react-router-dom";
 
 import { Dialog } from "@reach/dialog";
 import "@reach/dialog/styles.css";
 
 const Problem2 = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const state = location.state;
+
+  console.log(location);
 
   const [showModelC, setShowModelC] = useState(false);
 
@@ -37,7 +41,7 @@ const Problem2 = () => {
           <Route path="/model-b" element={<ModelB />} />
         </Routes>
 
-        {showModelC && <ModelC />}
+        {state?.backgroundLocation && <ModelC />}
       </div>
     </div>
   );
@@ -61,15 +65,18 @@ function ModelA() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredContacts, setFilteredContacts] = useState([]);
 
+  // console.log(lists);
+
   useEffect(() => {
     const fetchList = async () => {
-      setLoading(false);
+      setLoading(true);
 
       try {
-        // const data = await axios.get(
-        //   `https://contact.mediusware.com/api/contacts/?search=0&page=${page}&page_size=2`
-        // );
-        // console.log(data.data);
+        const data = await axios.get(
+          `https://contact.mediusware.com/api/contacts/?search=0&page=${page}&page_size=2`
+        );
+
+        setLists(data.data.results);
       } catch (error) {
         console.log(error);
       } finally {
@@ -84,7 +91,7 @@ function ModelA() {
     return lists.filter((list) => list.country === "US");
   };
 
-  console.log(filteredList());
+  // console.log(filteredList());
 
   const submitSearch = (e) => {
     e.preventDefault();
@@ -171,26 +178,20 @@ function ModelA() {
 
         {!loading && (
           <ul>
-            <li>Item 1</li>
-            <li>Item 1</li>
-            <li>Item 1</li>
-            <li>Item 1</li>
-            <li>Item 1</li>
-            <li>Item 1</li>
-            <li>Item 1</li>
-            <li>Item 1</li>
-            <li>Item 1</li>
-            <li>Item 1</li>
-            <li>Item 1</li>
-            <li>Item 1</li>
-            <li>Item 1</li>
-            <li>Item 1</li>
-            <li>Item 1</li>
-            <li>Item 1</li>
-            <li>Item 1</li>
-            <li>Item 1</li>
-            <li>Item 1</li>
-            <li>Item 1</li>
+            {lists.map((list) => {
+              return (
+                <li
+                  onClick={() =>
+                    navigate(location.pathname, {
+                      state: { backgroundLocation: true },
+                    })
+                  }
+                  key={list.id}
+                >
+                  Phone: {list.phone}, Country: {list.country?.name}
+                </li>
+              );
+            })}
           </ul>
         )}
       </div>
@@ -201,8 +202,7 @@ function ModelA() {
         <div className="flex-fill d-flex align-items-center">
           <input type="checkbox" id="vehicle1" name="vehicle1" value="Bike" />
           <label htmlFor="vehicle1" className="ms-1">
-            {" "}
-            I have a bike
+            Only even
           </label>
         </div>
         <button
@@ -279,12 +279,14 @@ function ModelB() {
 function ModelC() {
   const navigate = useNavigate();
 
+  const location = useLocation();
+
   return (
     <Dialog>
-      <h2>Model B</h2>
+      <h2>Model C</h2>
       <hr />
 
-      <p>content</p>
+      <p>Some random infos</p>
 
       <hr />
 
@@ -308,7 +310,11 @@ function ModelC() {
           US Contacts
         </button>
         <button
-          onClick={() => navigate("/problem-2")}
+          onClick={() =>
+            navigate(location.pathname, {
+              state: { backgroundLocation: false },
+            })
+          }
           className="btn btn-primary me-2"
         >
           Cancel
